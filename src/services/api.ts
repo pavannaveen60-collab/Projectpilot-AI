@@ -17,7 +17,7 @@ interface ApiResponse<T> {
   fallback?: boolean;
 }
 
-const REQUEST_TIMEOUT_MS = 25000;
+const REQUEST_TIMEOUT_MS = 90000;
 
 function getAuthHeaders(): Record<string, string> {
   const headers: Record<string, string> = {
