@@ -1,0 +1,147 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation helper for User Profile
+    function isValidUserProfile(data) {
+      return data.userId is string && data.userId == request.auth.uid &&
+             data.name is string && data.name.size() >= 2 && data.name.size() <= 100 &&
+             data.degree is string && data.degree.size() <= 120 &&
+             data.academicYear is string && data.academicYear.size() <= 50 &&
+             (!('email' in data) || (data.email is string && data.email.size() <= 150)) &&
+             (!('careerGoal' in data) || (data.careerGoal is string && data.careerGoal.size() <= 200));
+    }
+
+    // Validation helper for Project
+    function isValidProject(data) {
+      return data.id is string && isValidId(data.id) &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.title is string && data.title.size() >= 2 && data.title.size() <= 200 &&
+             data.status in ['active', 'archived', 'completed'];
+    }
+
+    // Validation helper for Roadmap Task
+    function isValidRoadmapTask(data) {
+      return data.id is string && isValidId(data.id) &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.projectId is string && isValidId(data.projectId) &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
+             data.status in ['not-started', 'in-progress', 'completed'];
+    }
+
+    // Validation helper for Mentor Message
+    function isValidMentorMessage(data) {
+      return data.id is string && isValidId(data.id) &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.role in ['user', 'assistant'] &&
+             data.content is string && data.content.size() <= 8000;
+    }
+
+    // Validation helper for Saved Idea
+    function isValidSavedIdea(data) {
+      return data.id is string && isValidId(data.id) &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.title is string && data.title.size() >= 2 && data.title.size() <= 200;
+    }
+
+    // User Profile matching rule
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUserProfile(incoming()) &&
+                       incoming().createdAt == request.time;
+      allow update: if isOwner(userId) && isValidUserProfile(incoming()) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().updatedAt == request.time &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'name', 'degree', 'academicYear', 'programmingLanguages',
+                         'technicalSkills', 'frameworks', 'areasOfInterest', 'preferredDomain',
+                         'difficultyLevel', 'availableDuration', 'teamSize', 'careerGoal',
+                         'preferredTechnologies', 'updatedAt'
+                       ]);
+      allow delete: if isOwner(userId);
+
+      // Projects subcollection
+      match /projects/{projectId} {
+        allow get: if isOwner(userId) && isValidId(projectId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(projectId) && isValidProject(incoming()) &&
+                         incoming().userId == userId &&
+                         incoming().createdAt == request.time;
+        allow update: if isOwner(userId) && isValidId(projectId) && isValidProject(incoming()) &&
+                         incoming().id == existing().id &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().updatedAt == request.time &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'title', 'shortDescription', 'problemStatement', 'targetUsers',
+                           'realWorldUseCase', 'coreFeatures', 'recommendedTechStack',
+                           'aiComponent', 'difficulty', 'overallFit', 'status', 'updatedAt'
+                         ]);
+        allow delete: if isOwner(userId) && isValidId(projectId);
+
+        // Roadmap tasks subcollection
+        match /roadmap/{taskId} {
+          allow get: if isOwner(userId) && isValidId(taskId);
+          allow list: if isOwner(userId);
+          allow create: if isOwner(userId) && isValidId(taskId) && isValidRoadmapTask(incoming()) &&
+                           incoming().userId == userId && incoming().projectId == projectId;
+          allow update: if isOwner(userId) && isValidId(taskId) && isValidRoadmapTask(incoming()) &&
+                           incoming().id == existing().id &&
+                           incoming().userId == existing().userId &&
+                           incoming().projectId == existing().projectId &&
+                           incoming().diff(existing()).affectedKeys().hasOnly([
+                             'status', 'completedAt', 'updatedAt', 'notes'
+                           ]);
+          allow delete: if isOwner(userId) && isValidId(taskId);
+        }
+      }
+
+      // Mentor chat sessions
+      match /mentorSessions/{sessionId} {
+        allow get: if isOwner(userId) && isValidId(sessionId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(sessionId) && isValidMentorMessage(incoming()) &&
+                         incoming().userId == userId &&
+                         incoming().createdAt == request.time;
+        allow delete: if isOwner(userId) && isValidId(sessionId);
+      }
+
+      // Saved ideas collection
+      match /savedIdeas/{ideaId} {
+        allow get: if isOwner(userId) && isValidId(ideaId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(ideaId) && isValidSavedIdea(incoming()) &&
+                         incoming().userId == userId &&
+                         incoming().createdAt == request.time;
+        allow delete: if isOwner(userId) && isValidId(ideaId);
+      }
+    }
+  }
+}

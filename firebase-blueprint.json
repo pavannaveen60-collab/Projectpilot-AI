@@ -1,0 +1,110 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Student academic profile, skill preferences, and career goals",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 100, "minLength": 2 },
+        "email": { "type": "string", "maxLength": 150 },
+        "degree": { "type": "string", "maxLength": 120 },
+        "academicYear": { "type": "string", "maxLength": 50 },
+        "programmingLanguages": { "type": "string", "description": "Array of strings joined or list up to 20 items" },
+        "technicalSkills": { "type": "string", "description": "Array of technical competencies" },
+        "preferredDomain": { "type": "string", "maxLength": 100 },
+        "difficultyLevel": { "type": "string", "maxLength": 50 },
+        "availableDuration": { "type": "string", "maxLength": 50 },
+        "teamSize": { "type": "string", "maxLength": 50 },
+        "careerGoal": { "type": "string", "maxLength": 200 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "name", "degree", "academicYear", "createdAt"]
+    },
+    "Project": {
+      "title": "Project",
+      "description": "Selected or active student final-year project record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "shortDescription": { "type": "string", "maxLength": 1000 },
+        "problemStatement": { "type": "string", "maxLength": 3000 },
+        "difficulty": { "type": "string", "maxLength": 50 },
+        "overallFit": { "type": "number" },
+        "status": { "type": "string", "enum": ["active", "archived", "completed"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "title", "status", "createdAt"]
+    },
+    "RoadmapTask": {
+      "title": "RoadmapTask",
+      "description": "Individual task item in a project phase",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "projectId": { "type": "string", "maxLength": 128 },
+        "phaseId": { "type": "string", "maxLength": 64 },
+        "title": { "type": "string", "maxLength": 200 },
+        "status": { "type": "string", "enum": ["not-started", "in-progress", "completed"] },
+        "estimatedHours": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "projectId", "title", "status"]
+    },
+    "MentorMessage": {
+      "title": "MentorMessage",
+      "description": "Conversation message with the project-aware AI mentor",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "projectId": { "type": "string", "maxLength": 128 },
+        "role": { "type": "string", "enum": ["user", "assistant"] },
+        "content": { "type": "string", "maxLength": 8000 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "role", "content", "createdAt"]
+    },
+    "SavedIdea": {
+      "title": "SavedIdea",
+      "description": "AI-generated project idea saved for comparison",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "shortDescription": { "type": "string", "maxLength": 1000 },
+        "overallFit": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "title", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Stores student personal profile, skill preferences, and settings"
+    },
+    "/users/{userId}/projects/{projectId}": {
+      "schema": { "$ref": "#/entities/Project" },
+      "description": "Selected student final-year project document"
+    },
+    "/users/{userId}/projects/{projectId}/roadmap/{taskId}": {
+      "schema": { "$ref": "#/entities/RoadmapTask" },
+      "description": "Progress tracking tasks belonging to a specific student project"
+    },
+    "/users/{userId}/mentorSessions/{sessionId}": {
+      "schema": { "$ref": "#/entities/MentorMessage" },
+      "description": "Contextual chat history with the project mentor"
+    },
+    "/users/{userId}/savedIdeas/{ideaId}": {
+      "schema": { "$ref": "#/entities/SavedIdea" },
+      "description": "Student collection of bookmarked AI project ideas"
+    }
+  }
+}
