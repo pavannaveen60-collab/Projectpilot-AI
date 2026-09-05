@@ -252,7 +252,7 @@ CRITICAL GUIDELINES:
 6. Return strictly JSON adhering to the specified schema.`;
 
     const response = await client.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -392,7 +392,7 @@ Return a structured JSON blueprint covering:
 16. Future enhancements`;
 
     const response = await client.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -471,7 +471,7 @@ Each phase must contain:
 - tasks: array of 3 to 5 concrete tasks, each with id, title, description, estimatedHours (number), status ('not-started').`;
 
     const response = await client.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -560,7 +560,7 @@ Guidelines:
     });
 
     const response = await client.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-2.5-flash',
       contents,
       config: {
         systemInstruction,
@@ -625,7 +625,7 @@ Analyze:
 Return strictly JSON matching the required schema.`;
 
     const response = await client.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -688,7 +688,7 @@ Evaluate:
 Return strictly JSON.`;
 
     const response = await client.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -786,7 +786,7 @@ Return strictly JSON adhering to this structure:
 }`;
 
     const response = await client.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -850,7 +850,7 @@ function generateFallbackProjects(profile: any) {
         frontend: [primaryFramework, 'Tailwind CSS', 'Lucide React'],
         backend: [`${primaryLang} / API Gateway`, `${secondaryLang} Microservice`],
         database: ['Cloud Firestore', 'Google Cloud Storage'],
-        aiOrMl: ['Google Gemini API (gemini-3.8-flash)', 'Tesseract.js OCR'],
+        aiOrMl: ['Google Gemini API (gemini-2.5-flash)', 'Tesseract.js OCR'],
         cloudOrDevOps: ['Google Cloud Run', 'Docker'],
       },
       aiComponent: 'Gemini model extracting clinical markers, cross-referencing reference ranges, and formulating empathetic doctor-vetted summary cards.',
@@ -944,7 +944,7 @@ function generateFallbackProjects(profile: any) {
         frontend: [primaryFramework, 'Tailwind CSS', 'Lucide React'],
         backend: [primaryLang, secondaryLang, 'Express / FastAPI'],
         database: ['Firestore', 'Redis Cache'],
-        aiOrMl: ['Google Gemini API (gemini-3.8-flash)'],
+        aiOrMl: ['Google Gemini API (gemini-2.5-flash)'],
         cloudOrDevOps: ['Docker', 'Google Cloud Run', 'GitHub Actions'],
       },
       aiComponent: 'Gemini analyzing abstracted code diffs to detect semantic vulnerabilities beyond static regex patterns and generating unified diff patches.',
@@ -1057,7 +1057,7 @@ function generateFallbackBlueprint(project: any, profile: any) {
       frontend: ['React 19', 'Tailwind CSS', 'Vite'],
       backend: ['Node.js', 'Express', 'TypeScript'],
       database: ['Cloud Firestore', 'Redis'],
-      aiOrMl: ['Google Gemini API (gemini-3.8-flash)'],
+      aiOrMl: ['Google Gemini API (gemini-2.5-flash)'],
       cloudOrDevOps: ['Google Cloud Run', 'Docker'],
     },
     systemArchitecture: 'Client-Server architecture with a React Single Page Application communicating through authenticated REST API gateways to an Express backend. Gemini calls are mediated server-side with strict input sanitization, token caching, and schema validation.',
@@ -1398,7 +1398,7 @@ function generateFallbackImprovement(originalIdea: string) {
         frontend: ['React 19', 'Tailwind CSS', 'Lucide React'],
         backend: ['Node.js', 'Express', 'TypeScript'],
         database: ['Cloud Firestore', 'Local Storage Sync'],
-        aiOrMl: ['Google Gemini API (gemini-3.8-flash)'],
+        aiOrMl: ['Google Gemini API (gemini-2.5-flash)'],
         cloudOrDevOps: ['Google Cloud Run', 'Docker'],
       },
       novelAiHook: 'Real-time contextual mentor that inspects student task completion and dynamically provides stack-tailored code guidance.',
